@@ -1,0 +1,23 @@
+import unittest
+from unittest.mock import patch
+from main import run_application
+
+class TestRunner(unittest.TestCase):
+    @patch('main.process_ocr_data')
+    @patch('main.get_barcode_hash')
+    @patch('main.store_expiry_dates')
+    def test_run_application(self, mock_store_expiry_dates, mock_get_barcode_hash, mock_process_ocr_data):
+        # Mock the return values
+        mock_process_ocr_data.return_value = ['mocked_barcode1', 'mocked_barcode2']
+        mock_get_barcode_hash.return_value = {'mocked_barcode1': 'mocked_hash1', 'mocked_barcode2': 'mocked_hash2'}
+        mock_store_expiry_dates.return_value = None
+
+        # Run the application
+        run_application()
+
+        # Assert the mocks were called as expected
+        mock_process_ocr_data.assert_called_once()
+        mock_get_barcode_hash.assert_called_with('mocked_barcode1')
+        mock_get_barcode_hash.assert_called_with('mocked_barcode2')
+        mock_store_expiry_dates.assert_called_with('mocked_hash1', 'mocked_expiry_date1')
+        mock_store_expiry_dates.assert_called_with('mocked_hash2', 'mocked_expiry_date2')
